@@ -29,9 +29,6 @@ exports.initialize = function(pathsObj){
 exports.readListOfUrls = function(callback){
 
   httpHelpers.readContent(exports.paths.list, function(error, urls){
-
-    console.log(urls + 'here are the urls!!!!!!!!');
-
     callback(urls.split('\n'));
   });  
 
@@ -46,7 +43,7 @@ exports.isUrlInList = function(url, callback){
 
 };
 
-exports.addUrlToList = function(url){
+exports.addUrlToList = function(url, callback){
 
   fs.appendFile(exports.paths.list, url + "\n", function(error) { 
     if (error){
@@ -54,9 +51,12 @@ exports.addUrlToList = function(url){
     }
   });
 
+  if(callback) {
+    callback();
+  }
 };
 
-exports.isUrlArchived = function(url){
+exports.isUrlArchived = function(url, exists){
 
   var fullPath = exports.paths.archivedSites + url;
 
@@ -64,14 +64,32 @@ exports.isUrlArchived = function(url){
 
   fs.stat(fullPath, function(err, stat) {
     if(err == null) {
-        console.log('File exists');
-        result = true;
+      result = true;
     }
-  });
+    
+    exists(result);
   
-  return result;
-
+  });
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(urls){
+  urls.forEach(function(url){
+    fs.writeFile(exports.paths.archivedSites + "/" + url, '', 'utf8', function(error){
+      if(error) console.log("An error occured, sir.");
+    });
+  });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
