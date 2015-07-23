@@ -17,5 +17,30 @@ exports.serveAssets = function(res, asset, callback) {
 };
 
 
+exports.readContent = function(path, callback){
+  fs.readFile(path , 'utf8', function (error, content){
+    if(error){
+      return callback(error);
+    } else {
+      callback(null, content);
+    }
+  });
+};
+
+exports.collectData = function(request, callback){
+  var data = "";
+  request.on('data', function(chunk){
+    console.log(data + '   ======    data before adding "chunk" to it');
+    data += chunk;
+    console.log(data + ' ==== after adding "chunk" to it');
+  });
+  
+  request.on('end', function(){
+    console.log(data + ' ==== after the "on end"');
+    callback(JSON.parse(data));
+    console.log(data + ' ==== after the parsing');
+  });
+};
+
 
 // As you progress, keep thinking about what helper functions you can put here!
