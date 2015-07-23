@@ -32,16 +32,17 @@ exports.readListOfUrls = function(callback){
 
     console.log(urls + 'here are the urls!!!!!!!!');
 
-
-
     callback(urls.split('\n'));
   });  
 
 };
 
-exports.isUrlInList = function(url){
+exports.isUrlInList = function(url, callback){
 
-  return exports.readListOfUrls.indexOf(url) !== -1;
+  exports.readListOfUrls(function(urls){
+    var result = urls.indexOf(url) !== -1;
+    callback(result);
+  });
 
 };
 
