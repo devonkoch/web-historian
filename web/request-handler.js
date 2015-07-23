@@ -20,30 +20,50 @@ var actions = {
             httpHelpers.sendResponse(response, content);
           });
         } else {
+          console.log("url isn't archived");
           httpHelpers.sendResponse(response, null, 404);
         }
       });
     }
   },
   'POST': function(request, response){
+    console.log("POST");
     httpHelpers.collectData(request, function(data){
-      archive.addUrlToList(data.url);
-      httpHelpers.sendResponse(response, null, 302);
+
+      archive.isUrlInList(data.url, function(urlExists){
+        if(urlExists){
+          // return content of the url
+          httpHelpers.serveAssets(response, archive.paths.archivedSites + "/" + data.url, function(content){
+            httpHelpers.sendResponse(response, content);
+          });          
+
+        } else {
+          archive.addUrlToList(data.url);
+          archive.downloadUrls([data.url]);
+          // TODO: use html fetcher to scrape the content at the url
+        }
+        httpHelpers.sendResponse(response, null, 302);
+      });
+
     });
   },
   'OPTIONS': function(request, response){
-    // utils.sendResponse(response);
-    
+    console.log("Options");
+    httpHelpers.sendResponse(response);
   }
 };
 
 exports.handleRequest = function (request, response) {
-
+  
+  console.log("we're getting a request atm: " + request.method);
   
   var action = actions[request.method];
+
+  
   if(action) {
     action(request, response);
   } else {
+    console.log("action not found");
     httpHelpers.sendResponse(response, null, 404);
   }
 };

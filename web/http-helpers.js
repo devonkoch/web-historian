@@ -13,7 +13,7 @@ exports.headers = headers = {
 exports.sendResponse = function(response, data, statusCode){
   statusCode = statusCode || 200;
   response.writeHead(statusCode, headers);
-  response.end(JSON.stringify(data));
+  response.end(data);
 };
 
 exports.readContent = function(path, callback){
@@ -38,15 +38,15 @@ exports.serveAssets = function(res, asset, callback) {
 exports.collectData = function(request, callback){
   var data = "";
   request.on('data', function(chunk){
-    console.log(data + '   ======    data before adding "chunk" to it');
+    console.log("collecting" + data + " ------ data type:" + typeof data );
     data += chunk;
-    console.log(data + ' ==== after adding "chunk" to it');
   });
   
   request.on('end', function(){
-    console.log(data + ' ==== after the "on end"');
-    callback(JSON.parse(data));
-    console.log(data + ' ==== after the parsing');
+    console.log("ending" + data + " ------ data type:" + typeof data );
+    // callback(JSON.parse(data.slice(4)));
+    callback({url: data.slice(4)});
+    console.log("after end");
   });
 };
 

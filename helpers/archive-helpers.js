@@ -62,14 +62,10 @@ exports.isUrlArchived = function(url, exists){
 
   var result = false;
 
-  console.log("fullPath ==== " + fullPath);
-
   fs.stat(fullPath, function(err, stat) {
     if(err == null) {
-      console.log("it's there");
       result = true;
     }else{
-      console.log("it's not there!!!!!!");
       console.log(err);
     }
     exists(result);
@@ -84,17 +80,4 @@ exports.downloadUrls = function(urls){
     });
   });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
