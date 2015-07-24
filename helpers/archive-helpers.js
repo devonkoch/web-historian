@@ -3,6 +3,8 @@ var path = require('path');
 var _ = require('underscore');
 var httpHelpers = require('../web/http-helpers.js');
 var htmlFetcher = require('../workers/htmlfetcher.js');
+var CronJob = require('cron').CronJob;
+
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -22,6 +24,7 @@ exports.initialize = function(pathsObj){
   _.each(pathsObj, function(path, type) {
     exports.paths[type] = path;
   });
+
 };
 
 // The following function names are provided to you to suggest how you might
@@ -32,7 +35,6 @@ exports.readListOfUrls = function(callback){
   httpHelpers.readContent(exports.paths.list, function(error, urls){
     callback(urls.split('\n'));
   });  
-
 };
 
 exports.isUrlInList = function(url, callback){
@@ -93,3 +95,19 @@ exports.writeToExistingFile = function(url){
   });
 };
 
+exports.job = function() {
+  var writePerMinute = new CronJob('0 * * * * *', function(){
+    exports.readListOfUrls(function(urls){
+      urls.forEach(function(url){
+        exports.writeToExistingFile(url);
+      });
+    });
+      
+  }, function () {
+    // This function is executed when the job stops
+    console.log("The chronz are all gone :(")
+  },
+  true /* Start the job right now */,
+  "America/Los_Angeles" /* Time zone of this job. */
+  );
+};
