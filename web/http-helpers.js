@@ -44,7 +44,6 @@ exports.collectData = function(request, callback){
   
   request.on('end', function(){
     console.log("ending" + data + " ------ data type:" + typeof data );
-    // callback(JSON.parse(data.slice(4)));
     callback({url: data.slice(4)});
     console.log("after end");
   });

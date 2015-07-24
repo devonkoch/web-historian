@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var httpHelpers = require('./http-helpers.js');
+var http = require('http-request');
 // require more modules/folders here!
 
 
@@ -9,6 +10,7 @@ var actions = {
   'GET': function(request, response){
     if(request.url === '/'){
       // use index.html
+
       httpHelpers.serveAssets(response, archive.paths.siteAssets + "/index.html", function(content){
         httpHelpers.sendResponse(response, content);
       });
@@ -30,8 +32,8 @@ var actions = {
     console.log("POST");
     httpHelpers.collectData(request, function(data){
 
-      archive.isUrlInList(data.url, function(urlExists){
-        if(urlExists){
+      archive.isUrlInList(data.url, function(urlInList){
+        if(urlInList){
           // return content of the url
           httpHelpers.serveAssets(response, archive.paths.archivedSites + "/" + data.url, function(content){
             httpHelpers.sendResponse(response, content);
@@ -40,11 +42,13 @@ var actions = {
         } else {
           archive.addUrlToList(data.url);
           archive.downloadUrls([data.url]);
+          archive.writeToExistingFile(data.url);
           // TODO: use html fetcher to scrape the content at the url
-        }
-        httpHelpers.sendResponse(response, null, 302);
-      });
-
+          httpHelpers.serveAssets(response, archive.paths.siteAssets + "/loading.html", function(content){
+            httpHelpers.sendResponse(response, content, 302);
+          });
+      }
+    });
     });
   },
   'OPTIONS': function(request, response){

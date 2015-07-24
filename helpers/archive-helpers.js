@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var httpHelpers = require('../web/http-helpers.js');
+var htmlFetcher = require('../workers/htmlfetcher.js');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -77,6 +78,17 @@ exports.downloadUrls = function(urls){
   urls.forEach(function(url){
     fs.writeFile(exports.paths.archivedSites + "/" + url, '', 'utf8', function(error){
       if(error) console.log("An error occured, sir.");
+    });
+  });
+};
+
+exports.writeToExistingFile = function(url){
+  
+  htmlFetcher.fetchHTML(url, function(data){
+    fs.writeFile(exports.paths.archivedSites + '/' + url, data, "utf8", function(error){
+      if(error) {
+        console.log("There's an error with overwriting a file!");
+      }
     });
   });
 };
